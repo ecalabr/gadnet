@@ -138,7 +138,7 @@ What normalization mode to use. Applies to both data and labels (if norm_data an
 ## Model parameters
 The following parameters define the model:
 ```json
-"model_name": "unet_3d_bneck",
+"model_name": "unet_3d_bneck2",
 "base_filters": 32,
 "output_filters": 1,
 "layer_layout": [3, 4, 5],
@@ -151,7 +151,7 @@ The following parameters define the model:
 ```
 ### Explanations
 ```json
-"model_name": "unet_3d_bneck",
+"model_name": "unet_3d_bneck2",
 ```
 The name of the network that is going to be trained. This must be defined in net_builder.py
 ```json
