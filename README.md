@@ -2,9 +2,9 @@
 Gadnet is a 3D fully convolutional deep neural network designed to synthesize gadolinium enahnced T1 weighted brain MR images from pre-contrast images.
 
 # Installation
-The following command will pull a copy of Gadnet to your computer using git:
+The following command will clone a copy of Gadnet to your computer using git:
 ```bash
-git pull https://github.com/ecalabr/gadnet.git
+git clone https://github.com/ecalabr/gadnet.git
 ```
 
 # Data directory tree setup
