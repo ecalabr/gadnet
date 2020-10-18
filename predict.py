@@ -128,7 +128,7 @@ def predict(params, pred_dirs, out_dir, mask=None, best_last='last'):
     for pred_dir in pred_dirs:
         # define expected output file name to check if output prediction already exists
         model_name = os.path.basename(params.model_dir)
-        name_prefix = os.path.basename(pred_dir)
+        name_prefix = os.path.basename(pred_dir[0:-1] if pred_dir.endswith('/') else pred_dir)
         pred_out = os.path.join(out_dir, name_prefix + '_predictions_' + model_name + '.nii.gz')
         # if output doesn't already exist, then predict and make nii
         if not os.path.isfile(pred_out):

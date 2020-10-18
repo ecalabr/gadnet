@@ -207,32 +207,8 @@ if __name__ == '__main__':
         if not os.path.isdir(args.out_dir):
             os.mkdir(args.out_dir)
 
-    # get list of study directories
-    # load study dirs json file if it exists in the model directory
-    study_dirs_filepath = os.path.join(my_params.model_dir, 'study_dirs_list.json')
-    if os.path.isfile(study_dirs_filepath):
-        with open(study_dirs_filepath) as f:
-            study_dirs = json.load(f)
-
-    # handle renaming argument
-    if args.rename:
-        assert os.path.isdir(args.rename), "Rename argument specified but directory not found: {}".format(args.rename)
-        study_dirs = [os.path.join(args.rename, os.path.basename(os.path.dirname(item))) for item in study_dirs]
-        # make sure new data directories actually exist
-        missing = []
-        for item in study_dirs:
-            if not os.path.isdir(item):
-                missing.append(item)
-        if missing:
-            raise FileNotFoundError("Missing the following data directories: {}".format(', '.join(missing)))
-
-    # otherwise try to recreate study dirs in same way as train.py
-    elif os.path.isdir(my_params.data_dir):
-        study_dirs = get_study_dirs(my_params)
-    # otherwise error, because there is no way to make sure we are using the correct directories for evaluation
-    else:
-        raise ValueError("Study directory file does not exist at {} and study directory does not exist at {}".format(
-            study_dirs_filepath, my_params.data_dir))
+    # get list of study valid study directories - optionally change base directory name
+    study_dirs = get_study_dirs(my_params, change_basedir=args.rename if os.path.isdir(args.rename) else None)
 
     # separate eval dirs from list of all study dirs using train fraction (same function used by train.py)
     _, my_eval_dirs = train_test_split(study_dirs, my_params)
