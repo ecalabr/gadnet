@@ -20,7 +20,7 @@
   "label_interp": 1,
   "mask_weights": false,
   "metrics": ["mae"],
-  
+
   "norm_data": false,
   "norm_labels": false,
   "norm_mode": "zscore",
@@ -33,7 +33,7 @@
   "kernel_size": [3, 3, 3],
   "data_format": "channels_last",
   "activation": "leaky_relu",
-  "mixed_precision": false,
+  "mixed_precision": true,
   "dist_strat": "mirrored",
 
   "shuffle_size": 1600,
@@ -41,8 +41,8 @@
   "num_threads": 6,
   "samples_per_epoch": 32000,
   "train_fract": 0.9,
-  "learning_rate": [0.002, 15, 0.5],
-  "learning_rate_decay": "simple_step",
+  "learning_rate": 0.001,
+  "learning_rate_decay": "constant",
   "optimizer": "adam",
   "loss": "MSE",
   "num_epochs": 25,

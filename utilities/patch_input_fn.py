@@ -264,18 +264,18 @@ def _patch_input_fn_3d(params, mode, train_dirs, eval_dirs, infer_dir=None):
 # saves a copy of output to study_dirs_list.json in study directory
 def get_study_dirs(params, change_basedir=None):
 
-    # Study dirs and prefixes setup
+    # Study dirs json filename setup
     study_dirs_filepath = os.path.join(params.model_dir, 'study_dirs_list.json')
 
     # load study dirs file if it already exists for consistent training
     if os.path.isfile(study_dirs_filepath):
-        if params.mode == 'train':
-            logging.info("Loading existing study directories file for training: {}".format(study_dirs_filepath))
+        logging.info("Loading existing study directories file: {}".format(study_dirs_filepath))
         with open(study_dirs_filepath) as f:
             study_dirs = json.load(f)
 
         # handle change_basedir argument
         if change_basedir:
+            # get rename list of directories
             study_dirs = [os.path.join(change_basedir, os.path.basename(os.path.dirname(item))) for item in study_dirs]
             if not all([os.path.isdir(d) for d in study_dirs]):
                 logging.error("Using change basedir argument in get_study_dirs but not all study directories exist")
@@ -287,14 +287,21 @@ def get_study_dirs(params, change_basedir=None):
                 raise FileNotFoundError("Missing the following data directories: {}".format(', '.join(missing)))
 
         # make sure that study directories loaded from file actually exist and warn/error if some/all do not
-        valid_study_dirs = [study for study in study_dirs if all(
-            [glob('{}/*{}.nii.gz'.format(study, item)) and os.path.isfile(glob('{}/*{}.nii.gz'.format(study, item))[0])
-             for item in params.data_prefix + params.label_prefix])]
+        valid_study_dirs = []
+        for study in study_dirs:
+            # get list of all expected files via glob
+            files = [glob("{}/*{}.nii.gz".format(study, item)) for item in params.data_prefix + params.label_prefix]
+            # check that a file was found and that file exists in each case
+            if all(files) and all([os.path.isfile(f[0]) for f in files]):
+                valid_study_dirs.append(study)
+        # case, no valid study dirs
         if not valid_study_dirs:
             logging.error("study_dirs_list.json exists in the model directory but does not contain valid directories")
             raise ValueError("No valid study directories in study_dirs_list.json")
-        elif len(valid_study_dirs) < study_dirs:
+        # case, less valid study dirs than found in study dirs file
+        elif len(valid_study_dirs) < len(study_dirs):
             logging.warning("Some study directories listed in study_dirs_list.json are missing or incomplete")
+        # case, all study dirs in study dirs file are valid
         else:
             logging.info("All directories listed in study_dirs_list.json are present and complete")
         study_dirs = valid_study_dirs
@@ -334,18 +341,23 @@ def train_test_split(study_dirs, params):
 
 # patch input function for 2d or 3d
 def patch_input_fn(params, mode, infer_dir=None):
+
     # set global random seed for tensorflow
     tf.random.set_seed(params.random_state)
 
-    # get valid study directories
-    study_dirs = get_study_dirs(params)
-
-    # split study directories into train and test sets
-    train_dirs, eval_dirs = train_test_split(study_dirs, params)
-
-    # handle infer dir argument
-    if infer_dir:
+    # handle inference mode
+    if mode == 'infer':
         infer_dir = tf.constant([infer_dir])
+        train_dirs = []
+        eval_dirs = []
+
+    # handle train and eval modes
+    else:
+        # get valid study directories
+        study_dirs = get_study_dirs(params)
+
+        # split study directories into train and test sets
+        train_dirs, eval_dirs = train_test_split(study_dirs, params)
 
     # handle 2D vs 3D
     if params.dimension_mode == '2D':  # handle 2d inputs

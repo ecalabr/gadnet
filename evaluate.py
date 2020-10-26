@@ -1,14 +1,16 @@
+"""Evaluate a trained model"""
+
 import argparse
 import logging
 import os
-# set tensorflow logging to FATAL before importing
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # 0 = INFO, 1 = WARN, 2 = ERROR, 3 = FATAL
-logging.getLogger('tensorflow').setLevel(logging.FATAL)
 import nibabel as nib
 import numpy as np
 import json
 import subprocess
 from glob import glob
+# set tensorflow logging to FATAL before importing things that contain tensorflow
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # 0 = INFO, 1 = WARN, 2 = ERROR, 3 = FATAL
+logging.getLogger('tensorflow').setLevel(logging.ERROR)
 from predict import predict
 from utilities.eval_metrics import metric_picker
 from utilities.patch_input_fn import get_study_dirs, train_test_split
@@ -193,6 +195,7 @@ if __name__ == '__main__':
     # turn of distributed strategy and mixed precision
     my_params.dist_strat = None
     my_params.mixed_precision = False
+
     # determine model dir
     if my_params.model_dir == 'same':  # this allows the model dir to be inferred from params.json file path
         my_params.model_dir = os.path.dirname(args.param_file)
@@ -207,18 +210,18 @@ if __name__ == '__main__':
         if not os.path.isdir(args.out_dir):
             os.mkdir(args.out_dir)
 
-    # get list of study valid study directories - optionally change base directory name
-    study_dirs = get_study_dirs(my_params, change_basedir=args.rename if os.path.isdir(args.rename) else None)
-
-    # separate eval dirs from list of all study dirs using train fraction (same function used by train.py)
-    _, my_eval_dirs = train_test_split(study_dirs, my_params)
-
     # set up logger, delete old log file if overwrite param is set to yes
     log_path = os.path.join(args.out_dir, 'evaluate.log')
     if os.path.isfile(log_path) and my_params.overwrite == 'yes':
         os.remove(log_path)
     set_logger(log_path)
     logging.info("Log file created at " + log_path)
+
+    # get list of study valid study directories - optionally change base directory name
+    study_dirs = get_study_dirs(my_params, change_basedir=args.rename)
+
+    # separate eval dirs from list of all study dirs using train fraction (same function used by train.py)
+    _, my_eval_dirs = train_test_split(study_dirs, my_params)
 
     # predict output niis
     niis_pred = predict(my_params, my_eval_dirs, args.out_dir, mask=args.mask, best_last=args.best_last)
