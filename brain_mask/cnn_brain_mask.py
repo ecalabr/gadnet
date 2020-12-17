@@ -3,7 +3,7 @@
 import argparse
 import os
 from glob import glob
-from prob2seg import convert_prob
+from brain_mask.prob2seg import convert_prob
 import logging
 from utilities.utils import Params
 from predict import predict
@@ -15,7 +15,7 @@ logging.getLogger('tensorflow').setLevel(logging.FATAL)
 
 
 # define function to make a batch of brain masks from a list of directories
-def batch_mask(infer_direcs, param_files, out_dir, suffix, overwrite=False, thresh=0.5):
+def batch_mask(infer_direcs, param_files, out_dir, suffix, overwrite=False, thresh=0.5, checkpoint='last'):
     # ensure that infer_direcs is list
     if not isinstance(infer_direcs, (list, tuple)):
         infer_direcs = [infer_direcs]
@@ -36,7 +36,7 @@ def batch_mask(infer_direcs, param_files, out_dir, suffix, overwrite=False, thre
             if not os.path.isdir(params.model_dir):
                 raise ValueError("Specified model directory does not exist")
             # run predict on one directory and get the output probabilities
-            prob = predict(params, [direc], out_dir, mask=None, best_last='last')  # direc must be list for predict fn
+            prob = predict(params, [direc], out_dir, mask=None, checkpoint=checkpoint)  # direc must be list
             probs.append(prob[0])  # output of predict fn is a list, this converts back to string so its not nested list
 
         # convert probs to mask with cleanup
@@ -84,6 +84,11 @@ if __name__ == '__main__':
                         help="Probability threshold for predictions")
     parser.add_argument('-u', '--suffix', default="combined_brain_mask",
                         help="Probability threshold for predictions")
+    parser.add_argument('-c', '--checkpoint', default='last',
+                        help="Can be 'best', 'last', or an hdf5 filename in the checkpoints subdirectory of model_dir")
+    parser.add_argument('-f', '--force_cpu', default=False,
+                        help="Disable GPU and force all computation to be done on CPU",
+                        action='store_true')
 
     # handle model_dir argument
     args = parser.parse_args()
@@ -158,10 +163,16 @@ if __name__ == '__main__':
         else:
             print("Skipping {} which does not have all the required images.".format(inf_dir))
 
+    # handle force cpu argument
+    if args.force_cpu:
+        logging.info("Forcing CPU (GPU disabled)")
+        os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
     # do work
     output_names = batch_mask(compl_infer_dirs,
                               my_param_files,
                               args.out_dir,
                               args.suffix,
                               overwrite=args.overwrite,
-                              thresh=args.thresh)
+                              thresh=args.thresh,
+                              checkpoint=args.checkpoint)
