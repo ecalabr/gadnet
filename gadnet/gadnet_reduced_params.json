@@ -1,11 +1,11 @@
 {
-  "data_dir": "/data/gliogenomics/gliomarad",
+  "data_dir": "test_data",
   "model_dir": "same",
   "overwrite": true,
   "random_state": 42,
 
-  "data_prefix": ["T1_wmtbn", "T2_wmtbn", "FLAIR_wmtbn"],
-  "label_prefix": ["T1gad_wmtbn"],
+  "data_prefix": ["T1", "T2", "FLAIR"],
+  "label_prefix": ["T1gad"],
   "mask_prefix": ["tumor_core"],
   "mask_dilate": [232, 232, 80],
   "filter_zero": 0.2,
