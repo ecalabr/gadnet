@@ -71,3 +71,10 @@ Evaluation metrics can be manually specified using "-t":
 ```bash
 python evaluate.py -p gadnet/gadnet_full_params.json -c full_model -t smape ssim logac
 ```
+
+## Citation
+Please cite the following publication(s) if you use any part of this project for your own work:
+
+1. [manuscript currently under review]
+
+Citation(s) will be updated once the associated manuscripts are published.
