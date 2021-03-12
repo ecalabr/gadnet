@@ -7,6 +7,8 @@ The following command will clone a copy of Gadnet to your computer using git:
 git clone https://github.com/ecalabr/gadnet.git
 ```
 
+**NOTE: It is recommended that you create at python 3 conda environment to run this package. Required modules are listed in the included requirements.txt file. An NVIDIA GPU and a working installation of the CUDA toolkit and cuDNN are strongly recommended.**
+
 # Data directory tree setup
 Gadnet expects your image data to be in Nifti format with a specific directory tree. The following example starts with any directory. Here we are using the "test_data" directory included in the git repository.
 
