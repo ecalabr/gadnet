@@ -75,16 +75,17 @@ python evaluate.py -p gadnet/gadnet_full_params.json -c full_model -t smape ssim
 ## Citation
 Please cite the following publication if you use any part of this project for your own work:
 
-Calabrese E, Rudie JD, Rauschecker AM, Villanueva-Meyer JE, Cha S. Feasibility of Simulated Postcontrast MRI of Glioblastomas and Lower Grade Gliomas Using 3D Fully Convolutional Neural Networks. Radiology: Artificial Intelligence. 2021 May 19:e200276.
-
+Calabrese E, Rudie JD, Rauschecker AM, Villanueva-Meyer JE, Cha S. Feasibility of Simulated Postcontrast MRI of Glioblastomas and Lower-Grade Gliomas by Using Three-dimensional Fully Convolutional Neural Networks. Radiology: Artificial Intelligence. 2021 May 19;3(5):e200276.
 DOI: https://doi.org/10.1148/ryai.2021200276
 
 BibTeX:
 ```
 @article{calabrese2021feasibility,
-  title={Feasibility of Simulated Postcontrast MRI of Glioblastomas and Lower Grade Gliomas Using 3D Fully Convolutional Neural Networks},
+  title={Feasibility of Simulated Postcontrast MRI of Glioblastomas and Lower-Grade Gliomas by Using Three-dimensional Fully Convolutional Neural Networks},
   author={Calabrese, Evan and Rudie, Jeffrey D and Rauschecker, Andreas M and Villanueva-Meyer, Javier E and Cha, Soonmee},
   journal={Radiology: Artificial Intelligence},
+  volume={3},
+  number={5},
   pages={e200276},
   year={2021},
   publisher={Radiological Society of North America}
